@@ -9,7 +9,7 @@
 # = Input parameters =
 # This script accepts the following input parameters:
 #
-# - `-f "<AWS CLI EC2 filter list>"` : a filer list confirming to AWS CLI EC2
+# - `-f "<AWS CLI EC2 filter list>"` : a filer list conforming to AWS CLI EC2
 # +        `describe-instances` [--filters] syntax
 # - `-n <number>` : port number to return alongside the discovered IP addresses
 # - `[-i <number>]` : optional Network Interface Device Index, `0` by default
@@ -87,7 +87,7 @@ trap cleanup EXIT
 # Parse flags
 while getopts "f:n:i:pg" opt; do
     case "$opt" in
-        f)  filterString="${OPTARG}"
+        f)  filterString="Name=instance-state-name,Values=running ${OPTARG}"
             ;;
         n)  outPort=${OPTARG}
             ;;

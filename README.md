@@ -1,6 +1,6 @@
 # AWS Service Discovery plugin for Pulse vTM
 
-This is a plugin for Service Discovery feature in [Pulse Virtual Traffic Manager (vTM) v18.1 and later](https://www.pulsesecure.net/vadc/). It is designed to query AWS API using the filer specified as a parameter, and return a list of IP addresses from matching EC2 instances which vTM can use to populate the list of nodes in a pool.
+This is a plugin for Service Discovery feature in [Pulse Virtual Traffic Manager (vTM) v18.1 and later](https://www.pulsesecure.net/vadc/). It is designed to query AWS API using the filter specified as a parameter, and return a list of IP addresses from matching EC2 instances which vTM can use to populate the list of nodes in a pool.
 
 Please see [blog](http://blah) post for introduction to vTM Service Discovery.
 
@@ -16,7 +16,7 @@ This plugin requires:
 
 The plugin takes the following parameters:
 
-- `-f "<AWS CLI EC2 filter list>"` : a filer list confirming to AWS CLI EC2 `describe-instances` [--filters](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html#options) syntax
+- `-f "<AWS CLI EC2 filter list>"` : a filer list conforming to AWS CLI EC2 `describe-instances` [--filters](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html#options) syntax
 - `-n <number>` : port number to return alongside the discovered IP addresses
 - `[-i <number>]` : optional Network Interface Device Index, `0` by default
 - `[-p]` : optional parameter telling plugin to return `Public` IP addresses of matching instances instead of default `Private`
@@ -24,7 +24,7 @@ The plugin takes the following parameters:
 
 ### Filters
 
-A list of filters passed through the `-f` parameter must be enclosed in double quotes. Plugin will pass this list verbatim to the `--filters` parameter of the AWS CLI. This filter is what tells the plugin what EC2 instances are "interesting". Typically it would be one or more pairs of tags Names + Values, for example:
+A list of filters passed through the `-f` parameter must be enclosed in double quotes. Plugin will pass this list verbatim to the `--filters` parameter of the AWS CLI. This filter is what tells the plugin what EC2 instances are "interesting". Typically it would be one or more pairs of tag Names + Values, for example:
 
 Tag: `ClusterID`, Value: `My-Cluster-123`, which would translate into the following filter string:
 
@@ -40,7 +40,7 @@ Multiple filters should be separated by spaces, e.g.:
 
 ### Port Number
 
-vTM Service Discovery expects its plugins to return a list of IP addresses of the pool nodes, along with the TCP/UDP port number for each node.
+vTM Service Discovery expects its plugins to return a list of IP addresses of the pool nodes along with the TCP/UDP port number for each node.
 
 Since this plugin only discovers IP addresses, it needs a port number specified explicitly through the `-n` parameter, which it will return with all IP addresses it discovers.
 
@@ -64,7 +64,7 @@ If possible, install `jq` and `aws` during the vTM deploy time, using for exampl
 
 ## Usage
 
-Refer to the [blog post](http://blah) for general introduction to vTM Service Discovery. The main difference between the K8s plugin described in this post and this one is the target of Service Discovery.
+Refer to the [blog post](http://blah) for general introduction to vTM Service Discovery. The main difference between the K8s plugin described in that post and this one is the target of Service Discovery.
 
 To start using it, follow these steps:
 
@@ -80,8 +80,9 @@ If all is well, the test should return the list of matching IP(s) with port 80, 
 10.0.0.120:80
 10.0.1.36:80
 
-Once you tested your plugin successfully, you can create pool(s) that use it to discover nodes.
+Once you've tested your plugin successfully, you can create pool(s) that use it to discover nodes.
 
 ## Limitations
 
-Only IPv4 is currently supported.
+- Only IPv4 is currently supported
+- Plugin only discovers the EC2 instances in the same AWS Region as the vTM it runs on
