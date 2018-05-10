@@ -15,6 +15,8 @@
 # - `[-i <number>]` : optional Network Interface Device Index, `0` by default
 # - `[-p]` : optional parameter telling plugin to return `Public` IP addresses
 # +        of matching instances instead of default `Private`
+# - `[-r <region>]` : optional parameter telling plugin to look in a specified
+# +        AWS Region, vs. the same one where vTM with this plugin is running
 # - `[-g]` : optional parameter telling Plugin to download and install its
 # +        dependencies, `jq` and `aws`
 #
@@ -36,6 +38,7 @@ filterString=""         # AWS CLI filter to match
 deviceIndex="0"         # Device Index to look at, default = 0
 returnPublicIP="No"     # By default, return primary Private IP
 getDeps="No"            # Whether to try downloading jq + kubectl
+region=""               # By default, use the one we're running in
 
 if [[ ! ${ZEUSHOME} && ${ZEUSHOME-_} ]]; then
     # $ZEUSHOME is unset! Let's make an unsafe assumption we're *not* on a VA. :)
@@ -85,7 +88,7 @@ cleanup  () {
 trap cleanup EXIT
 
 # Parse flags
-while getopts "f:n:i:pg" opt; do
+while getopts "f:n:i:pr:g" opt; do
     case "$opt" in
         f)  filterString="Name=instance-state-name,Values=running ${OPTARG}"
             ;;
@@ -94,6 +97,8 @@ while getopts "f:n:i:pg" opt; do
         i)  deviceIndex=${OPTARG}
             ;;
         p)  returnPublicIP="Yes"
+            ;;
+        r)  region=${OPTARG}
             ;;
         g)  getDeps="Yes"
             ;;
@@ -264,9 +269,7 @@ checkLock() {
     oldLockF=( $(ls -1 ${lockFile}-* 2>/dev/null) )
     if [[ ${#oldLockF[*]} != "0" ]]; then
         # Found one or more of matching files; bailing.
-        outError="Another copy of this script is running: ${oldLockF[@]}"
-        outCode="400"
-        printOut
+        echo "{\"version\":1, \"code\":400, \"error\":\"Another copy of this script is running: ${oldLockF[@]}\"}"
         exit 0
     else
         # All clear; create a lock file for ourselves
@@ -278,7 +281,10 @@ checkLock() {
 # Talk to the AWS API using aws CLI command to get the list of IPs we're after
 #
 getNodes() {
-    region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
+    if [[ "${region}" == "" ]]; then
+        # If region wasn't specified through `-r`, use the one we're running in
+        region=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
+    fi
 
     aws ec2 describe-instances --region ${region} \
         --filters ${filterString} --output json \
@@ -288,7 +294,7 @@ getNodes() {
 
     if [[ "${awsError}" != "0" ]]; then
         outCode="500"
-        outError="Failed find instances matching filter: '${filterString}'"
+        outError="Failed find instances matching filter: '${filterString}'; error: $(head -1 ${errFile})"
         logMsg "001: aws ec2 describe-instances failed: (${awsError}); $(head -1 ${errFile})"
         printOut
         exit 1
@@ -317,24 +323,19 @@ getNodes() {
     fi
 }
 
-checkPrerequisites
-
 # Check if we were given the mandatory parameters
 #
 if [[ "${filterString}" == "" ]]; then
-    outError="Filter String must be specified with '-f \"<AWS CLI EC2 filter list>\"'"
-    outCode="400"
-    printOut
+    echo "{\"version\":1, \"code\":400, \"error\":\"Filter String must be specified with '-f \\\"<AWS CLI EC2 filter list>\\\"'\"}"
     exit 1
 fi
 #
 if [[ "${outPort}" == "" ]]; then
-    outError="Port must be specified with '-n <number>'"
-    outCode="400"
-    printOut
+    echo "{\"version\":1, \"code\":400, \"error\":\"Port must be specified with '-n <number>'\"}"
     exit 1
 fi
 
 checkLock
+checkPrerequisites
 getNodes
 printOut

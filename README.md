@@ -20,6 +20,7 @@ The plugin takes the following parameters:
 - `-n <number>` : port number to return alongside the discovered IP addresses
 - `[-i <number>]` : optional Network Interface Device Index, `0` by default
 - `[-p]` : optional parameter telling plugin to return `Public` IP addresses of matching instances instead of default `Private`
+- `[-r <region>]` : optional parameter telling plugin to look in a specified AWS Region, vs. the same one where vTM with this plugin is running
 - `[-g]` : optional parameter telling Plugin to download and install its dependencies, `jq` and `aws`
 
 ### Filters
@@ -37,6 +38,24 @@ Tag: `ClusterID`, Value: `My-Cluster-123`, which would translate into the follow
 Multiple filters should be separated by spaces, e.g.:
 
 `"Name=tag:ClusterID,Values=My-Cluster-123 Name=tag:AppComponent,Values=Backend"`
+
+It is a common requirement to discover EC2 instances managed by an AWS Auto Scaling Group. For this to work, set the Name of your Auto Scaling Group (for e.g., using `"AutoScalingGroupName" : "<String>"` property in your CloudFormation template), and then use the resulting value in your filter. For example, if you deploy a CloudFormation stack called `MyStack` with the following Auto Scaling Group:
+
+```
+"WebServerGroup": {
+    "Type": "AWS::AutoScaling::AutoScalingGroup",
+    "Properties": {
+    "AutoScalingGroupName" : { "Fn::Join": [ "-", [ { "Ref": "AWS::StackName" }, "WebASG" ] ] },
+
+[...]
+
+    }
+}
+```
+
+your Auto Scaling Group will be called `MyStack-WebASG`, and you will be able to find running instances under its control using the following filter:
+
+`Name=tag:aws:autoscaling:groupName,Values=MyStack-WebASG`
 
 ### Port Number
 
@@ -75,9 +94,9 @@ To start using it, follow these steps:
 
 If all is well, the test should return the list of matching IP(s) with port 80, something along the lines of:
 
-> **Code:** 200
-**Nodes:**
-10.0.0.120:80
+> **Code:** 200  
+**Nodes:**  
+10.0.0.120:80  
 10.0.1.36:80
 
 Once you've tested your plugin successfully, you can create pool(s) that use it to discover nodes.
@@ -85,4 +104,3 @@ Once you've tested your plugin successfully, you can create pool(s) that use it 
 ## Limitations
 
 - Only IPv4 is currently supported
-- Plugin only discovers the EC2 instances in the same AWS Region as the vTM it runs on
