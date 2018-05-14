@@ -2,7 +2,11 @@
 
 This is a plugin for Service Discovery feature in [Pulse Virtual Traffic Manager (vTM) v18.1 and later](https://www.pulsesecure.net/vadc/). It is designed to query AWS API using the filter specified as a parameter, and return a list of IP addresses from matching EC2 instances which vTM can use to populate the list of nodes in a pool.
 
-Please see [blog](http://blah) post for introduction to vTM Service Discovery.
+Please see [blog](https://telecomoccasionally.wordpress.com/2018/05/14/use-pulse-virtual-traffic-manager-to-route-traffic-to-kubernetes-pods) post for introduction to vTM Service Discovery.
+
+## Disclaimer
+
+This plugin is a "proof of concept", and **should not** be used in production "as-is". Please treat this code as "unsupported" and "experimental". The idea is to provide a working prototype that can be used as an inspiration for your own implementation.
 
 ## Prerequisites
 
@@ -83,14 +87,15 @@ If possible, install `jq` and `aws` during the vTM deploy time, using for exampl
 
 ## Usage
 
-Refer to the [blog post](http://blah) for general introduction to vTM Service Discovery. The main difference between the K8s plugin described in that post and this one is the target of Service Discovery.
+Refer to the [blog post](https://telecomoccasionally.wordpress.com/2018/05/14/use-pulse-virtual-traffic-manager-to-route-traffic-to-kubernetes-pods) for general introduction to vTM Service Discovery. The main difference between the K8s plugin described in that post and this one is the target of Service Discovery.
 
 To start using it, follow these steps:
 
 - Add this plugin to your vTM cluster's `Catalogs` -> `Service Discovery` as a `Custom User Plugin`
 - Optionally test it by specifying a filter matching one or more running EC2 instances and a port number; for example:
 
-`-f "Name=tag:ClusterID,Values=My-Cluster-123" -n 80`
+`-f "Name=tag:ClusterID,Values=My-Cluster-123" -n 80` if your vTM has `jq` and `aws` installed, or
+`-f "Name=tag:ClusterID,Values=My-Cluster-123" -n 80 -g` if it hasn't.
 
 If all is well, the test should return the list of matching IP(s) with port 80, something along the lines of:
 

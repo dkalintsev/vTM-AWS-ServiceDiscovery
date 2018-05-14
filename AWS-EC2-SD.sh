@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Copyright (c) 2018 Pulse Secure LLC.
+#
 # This is a sample plugin for Pulse Virtual Traffic Manager (vTM) Flexible
 # Service Discovery.
 #
