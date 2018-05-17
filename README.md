@@ -2,7 +2,7 @@
 
 This is a plugin for Service Discovery feature in [Pulse Virtual Traffic Manager (vTM) v18.1 and later](https://www.pulsesecure.net/vadc/). It is designed to query AWS API using the filter specified as a parameter, and return a list of IP addresses from matching EC2 instances which vTM can use to populate the list of nodes in a pool.
 
-Please see [blog](https://telecomoccasionally.wordpress.com/2018/05/14/use-pulse-virtual-traffic-manager-to-route-traffic-to-kubernetes-pods) post for introduction to vTM Service Discovery.
+Please see [blog](https://telecomoccasionally.wordpress.com/2018/05/17/use-pulse-virtual-traffic-manager-to-route-traffic-to-kubernetes-pods) post for introduction to vTM Service Discovery.
 
 ## Disclaimer
 
@@ -87,7 +87,7 @@ If possible, install `jq` and `aws` during the vTM deploy time, using for exampl
 
 ## Usage
 
-Refer to the [blog post](https://telecomoccasionally.wordpress.com/2018/05/14/use-pulse-virtual-traffic-manager-to-route-traffic-to-kubernetes-pods) for general introduction to vTM Service Discovery. The main difference between the K8s plugin described in that post and this one is the target of Service Discovery.
+Refer to the [blog post](https://telecomoccasionally.wordpress.com/2018/05/17/use-pulse-virtual-traffic-manager-to-route-traffic-to-kubernetes-pods/) for general introduction to vTM Service Discovery. The main difference between the K8s plugin described in that post and this one is the target of Service Discovery.
 
 To start using it, follow these steps:
 
