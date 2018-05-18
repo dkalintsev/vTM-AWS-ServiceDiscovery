@@ -48,6 +48,7 @@ if [[ ! ${ZEUSHOME} && ${ZEUSHOME-_} ]]; then
     export ZEUSHOME="/usr/local/zeus"   # Docker image default
 fi
 
+configSync="${ZEUSHOME}/zxtm/bin/replicate-config"
 workDir="${ZEUSHOME}/zxtm/internal/servicediscovery"
 extrasDir="${ZEUSHOME}/zxtm/conf/extra"
 
@@ -172,6 +173,7 @@ printOut() {
 # Check prerequisites
 #
 checkPrerequisites () {
+    replicationNeeded="0"
     # Check for curl
     #
     which curl > /dev/null
@@ -215,6 +217,7 @@ checkPrerequisites () {
             fi
             rm -f jq-linux64
             cd - > /dev/null 2>&1
+            replicationNeeded="1"
         fi
         # Retest - do we now have it?
         which jq > /dev/null
@@ -252,6 +255,9 @@ checkPrerequisites () {
     if [[ "${missingTools}" != "" ]]; then
         echo "{\"version\":1, \"code\":400, \"error\":\"Prerequisite tool(s) missing:${missingTools}\"}"
         exit 1
+    fi
+    if [[ "${replicationNeeded}" == "1" ]]; then
+        $configSync > /dev/null 2>&1
     fi
 }
 
