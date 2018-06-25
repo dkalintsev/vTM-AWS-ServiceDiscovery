@@ -79,7 +79,7 @@ By default plugin will return the primary private IP address. If you need to get
 
 ### Dependency handling
 
-Plugin requires a copy of `jq` and `aws` helper utilities to be present on the vTM to function. Neither is shipped with vTM AWS Virtual Applicance (VA) by default. You can either install these during vTM deploy, or include the `-g` parameter with this plugin's invocation.
+Plugin requires a copy of `jq` and `aws` helper utilities to be present on the vTM to function. Neither is shipped with vTM AWS Virtual Appliance (VA) by default. You can either install these during vTM deploy, or include the `-g` parameter with this plugin's invocation.
 
 In the later case, plugin will attempt to download `jq` into `Extras` Catalogue on vTM, and download / install AWS CLI as `/usr/local/bin/aws`. This will mean that the very first run of the plugin will take much longer to complete. When operating a multi-instance vTM cluster, plugin is executed on the cluster leader instance. When cluster leader changes (e.g., due to old cluster leader experiencing problem), very first run on the new cluster leader will be subject to the same first run delay.
 
